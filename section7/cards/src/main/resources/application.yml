@@ -1,0 +1,25 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: "cards" #name should match with config server cards-prod.yml
+  profiles:
+    active: "qa"
+  datasource:
+    url: jdbc:mysql://localhost:3308/cardsdb
+    username: root
+    password: root
+  jpa:
+      show-sql: true
+  sql:
+    init:
+      mode: always
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+    #Optional keyword is to start the app despite error connecting to config server or config server down
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #Instead of refresh endpoint, enable all endpoints

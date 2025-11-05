@@ -1,0 +1,27 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: "accounts"
+  profiles:
+      active: "prod"
+  datasource:
+    url: jdbc:mysql://localhost:3306/accountsdb
+    username: root
+    password: root
+  jpa:
+    show-sql: true
+  sql:
+    init:
+      mode: always #To load schema.sql also make sure create table query contains IFEXISTS
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+    #Optional keyword is to start the app despite error connecting to config server or config server down
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #Instead of refresh endpoint, enable all endpoints
+        #include : refresh for refresh api
+

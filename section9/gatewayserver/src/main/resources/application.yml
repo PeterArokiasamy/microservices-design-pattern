@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  #Tell the gateway server to leverage the information present inside the discovery agent to forward all the requests
+  #that are coming from the external clients to individual MS
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true # to see default routing mapping endpoints of http://localhost:8072/actuator/gateway
+              lowerCaseServiceId: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "gatewayserver"
+    description: "Arokia Bank Gateway Server Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      arokia:
+        gatewayserver: DEBUG

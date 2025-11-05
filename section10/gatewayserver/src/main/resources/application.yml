@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  #Tell the gateway server to leverage the information present inside the discovery agent to forward all the requests
+  #that are coming from the external clients to individual MS
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true # to see default routing mapping endpoints of http://localhost:8072/actuator/gateway
+              lowerCaseServiceId: true
+          httpclient:
+            connect-timeout: 1000
+            response-timeout: 2s
+
+    data:
+      redis:
+        connect-timeout: 2s
+        host: localhost
+        port: 6379
+        timeout: 1s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "gatewayserver"
+    description: "Arokia Bank Gateway Server Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      arokia:
+        gatewayserver: DEBUG
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      #Default configuration. If you want specific circuit breaker then instead of default, use accountsCircuitBreaker
+      slidingWindowSize: 10
+      #Using this we communicate to circuit breaker pattern on how many requests it has initially monitor before it tries
+      # to change the status from close to open.
+      permittedNumberOfCallsInHalfOpenState: 2
+      # in open status, to allow to half open status
+      failureRateThreshold: 50
+      # 50% failure of request then move to open state from closed state.
+      waitDurationInOpenState: 10000
+      # Wait for 10s and move to half open to allow traffic.

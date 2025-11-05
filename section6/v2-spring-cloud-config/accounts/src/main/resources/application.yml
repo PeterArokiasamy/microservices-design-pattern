@@ -1,0 +1,37 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: "accounts"
+  profiles:
+      active: "prod"
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: '' #Empty Password
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update #Dont Create table instead load from data.sql
+    show-sql: true
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+    #Optional keyword is to start the app despite error connecting to config server or config server down
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #Instead of refresh endpoint, enable all endpoints
+        #include : refresh for refresh api
+

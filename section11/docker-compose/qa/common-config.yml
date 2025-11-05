@@ -1,0 +1,30 @@
+services:
+  network-deploy-service: #network related configuration
+    networks:
+      - peterarokiasamy
+
+  microservice-base-config:
+    #Whenever new microservices created inside our docker-compose, it will extend this service
+    #will be imported by other microsevice
+    extends:
+      service: network-deploy-service
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+
+  microservice-configserver-config:
+    #Will be used by MS which depends on config server.
+    extends:
+      service: microservice-base-config
+    #In recent version of docker compose, its no longer possible to utilize both extends and depends on.
+    #So depends_on still maintained inside docker compose rather than common-config yml
+    environment:
+      SPRING_PROFILES_ACTIVE: qa
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+
+  microservice-eureka-config:
+    extends:
+      service: microservice-configserver-config
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/

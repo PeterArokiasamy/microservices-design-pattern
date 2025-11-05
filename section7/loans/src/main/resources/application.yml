@@ -1,0 +1,25 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: "loans"
+  profiles:
+    active: "prod"
+  datasource:
+    url: jdbc:mysql://localhost:3307/loansdb
+    username: root
+    password: root
+    jpa:
+      show-sql: true
+  sql:
+    init:
+      mode: always
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+    #Optional keyword is to start the app despite error connecting to config server or config server down
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #Instead of refresh endpoint, enable all endpoints

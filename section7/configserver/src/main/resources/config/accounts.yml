@@ -1,0 +1,11 @@
+build:
+  version: "3.0"
+
+accounts:
+  message: "Welcome to Arokia accounts related local APIs "
+  contactDetails:
+    name: "John Alex - Developer"
+    email: "john@arokia.com"
+  onCallSupport:
+    - (60) 1021-69-024
+    - (44) 7440-38-281

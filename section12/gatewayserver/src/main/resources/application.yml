@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  #Tell the gateway server to leverage the information present inside the discovery agent to forward all the requests
+  #that are coming from the external clients to individual MS
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true # to see default routing mapping endpoints of http://localhost:8072/actuator/gateway
+              lowerCaseServiceId: true
+          httpclient:
+            connect-timeout: 1000
+            response-timeout: 10s
+
+  #data:
+      #redis:
+        #connect-timeout: 2s
+        #host: localhost
+        #port: 6379
+        #timeout: 1s
+  security:
+        oauth2:
+          resourceserver:
+            jwt:
+              jwk-set-uri: "http://localhost:7080/realms/master/protocol/openid-connect/certs"
+              #auth server url to download the certificates, In console go to "Realm settings"
+              #OpenID Endpoint Configuration and then jwks_uri
+              #So during start of resource server, it will download public certificate from keycloak server.
+              #Using this resource server can validate whether given token is valid or not. but not new tokens
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name} #To Group all metrics related to this MS, it helps to identify metrics
+
+info:
+  app:
+    name: "gatewayserver"
+    description: "Arokia Bank Gateway Server Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      arokia:
+        gatewayserver: DEBUG
+  logging:
+    pattern:
+      level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+      #Assign some 5 length characters before MS name like info, warning or error.
+      #Followed by metadata, trace id, span id
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      #Default configuration. If you want specific circuit breaker then instead of default, use accountsCircuitBreaker
+      slidingWindowSize: 10
+      #Using this we communicate to circuit breaker pattern on how many requests it has initially monitor before it tries
+      # to change the status from close to open.
+      permittedNumberOfCallsInHalfOpenState: 2
+      # in open status, to allow to half open status
+      failureRateThreshold: 50
+      # 50% failure of request then move to open state from closed state.
+      waitDurationInOpenState: 10000
+      # Wait for 10s and move to half open to allow traffic.

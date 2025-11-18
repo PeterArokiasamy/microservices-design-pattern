@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: "eurekaserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name} #To Group all metrics related to this MS, it helps to identify metrics
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+    #Assign some 5 length characters before MS name like info, warning or error.
+    #Followed by metadata, trace id, span id

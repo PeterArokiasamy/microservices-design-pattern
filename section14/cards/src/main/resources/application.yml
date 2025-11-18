@@ -1,0 +1,80 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: "cards" #name should match with config server cards-prod.yml
+  profiles:
+    active: "qa"
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+    #Optional keyword is to start the app despite error connecting to config server or config server down
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #Instead of refresh endpoint, enable all endpoints
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+    shutdown:
+      access: unrestricted # To shutdown account MS gracefully
+  info:
+    env:
+      enabled: true # Enable actuator endpoint
+  metrics:
+    tags:
+      application: ${spring.application.name} #To Group all metrics related to this MS, it helps to identify metrics
+
+#expose shutdown related API but not required
+endpoints:
+  shutdown:
+    enabled: true
+
+eureka:
+  instance:
+    #hostname: localhost since this is not eureka server
+    preferIpAddress: true
+    #Whenever account MS is trying to connect with eureka server, by default it will try to register with host name
+    # as we dont use DNS , Prefer as true, so card MS will register using its IP address.
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+info: # We can see this information in Eureka dashboard which will be display by actuator URL which is not
+  #enabled by default. So enable in above line
+  app:
+    name: "cards"
+    description: "Arokia Bank Cards Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      arokia:
+        cards: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+    #Assign some 5 length characters before MS name like info, warning or error.
+    #Followed by metadata, trace id, span id
